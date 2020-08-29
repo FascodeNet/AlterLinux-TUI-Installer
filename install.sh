@@ -471,40 +471,35 @@ install_to()
 			efidir=/efi/boot
 			rm -rf efi/efi/Android
 		fi
-		mkdir -p `dirname $grubcfg` efi$efidir
-		cp -af grub2/efi/boot/* efi$efidir
-		sed -i "s|VER|$VER|; s|CMDLINE|$cmdline|; s|OS_TITLE|$OS_TITLE|" efi$efidir/android.cfg
-		[ -s efi/boot/grub/grubenv ] || ( printf %-1024s "# GRUB Environment Block%" | sed 's/k%/k\n/; s/   /###/g' > efi/boot/grub/grubenv )
+		grub-install --target=x86_64-efi --efi-directory=./efi/ --bootloader-id="Alter Linux"
+		#mkdir -p `dirname $grubcfg` efi$efidir
+		#cp -af grub2/efi/boot/* efi$efidir
+		#sed -i "s|VER|$VER|; s|CMDLINE|$cmdline|; s|OS_TITLE|$OS_TITLE|" efi$efidir/android.cfg
+		#[ -s efi/boot/grub/grubenv ] || ( printf %-1024s "# GRUB Environment Block%" | sed 's/k%/k\n/; s/   /###/g' > efi/boot/grub/grubenv )
 
-		echo -e 'set timeout=5\nset debug_mode="(DEBUG mode)"' > $grubcfg
+		#echo -e 'set timeout=5\nset debug_mode="(DEBUG mode)"' > $grubcfg
 		# Our grub-efi doesn't support ntfs directly.
 		# Copy boot files to ESP so grub-efi could read them
-		if [ "$fs" = "fuseblk" ]; then
-			cp -f src/kernel src/initrd.img efi$efidir
-			echo -e "set kdir=$efidir\nset src=SRC=/$asrc" >> $grubcfg
-		else
-			echo -e "set kdir=/$asrc" >> $grubcfg
-		fi
-		echo -e '\nsource $cmdpath/android.cfg' >> $grubcfg
-		if [ -d src/boot/grub/theme ]; then
-			cp -R src/boot/grub/[ft]* efi/boot/grub
-			find efi/boot/grub -name TRANS.TBL -delete
-		fi
+		#if [ "$fs" = "fuseblk" ]; then
+	#		cp -f src/kernel src/initrd.img efi$efidir
+	#		echo -e "set kdir=$efidir\nset src=SRC=/$asrc" >> $grubcfg
+	#	else
+	#		echo -e "set kdir=/$asrc" >> $grubcfg
+	#	fi
+	#	echo -e '\nsource $cmdpath/android.cfg' >> $grubcfg
+	#	if [ -d src/boot/grub/theme ]; then
+	#		cp -R src/boot/grub/[ft]* efi/boot/grub
+	#		find efi/boot/grub -name TRANS.TBL -delete
+	#	fi
 
 		# Checking for old EFI entries, removing them and adding new depending on bitness
-		efibootmgr | grep -Eo ".{0,6}Alter Linux" | cut -c1-4 > /tmp/efientries
-		if [ -s /tmp/efientries ]; then
-			set_answer_if_auto 1
-			adialog --title " Question " --yesno "\nEFI boot entries for previous Alter Linux installations were found.\n\nDo you wish to delete them?" 10 61
-			[ $? -eq 0 ] && while read entry; do efibootmgr -Bb "$entry" > /dev/tty4 2>&1; done < /tmp/efientries
-		fi
-		efibootmgr -v -c -d /dev/$disk -p $esp -L "Alter Linux $VER" -l $efidir/$bootefi > /dev/tty4 2>&1
-
-		if [ -s efi/startup.nsh ]; then
-			sed -i "s|\\\\efi\\\\Android|$efidir|; s|/|\\\\|g" efi/startup.nsh
-		else
-			echo $efidir/$bootefi | sed 's|/|\\|g' > efi/startup.nsh
-		fi
+		#efibootmgr | grep -Eo ".{0,6}Alter Linux" | cut -c1-4 > /tmp/efientries
+		#if [ -s /tmp/efientries ]; then
+		#	set_answer_if_auto 1
+		#	adialog --title " Question " --yesno "\nEFI boot entries for previous Alter Linux installations were found.\n\nDo you wish to delete them?" 10 61
+		#	[ $? -eq 0 ] && while read entry; do efibootmgr -Bb "$entry" > /dev/tty4 2>&1; done < /tmp/efientries
+		#fi
+		#efibootmgr -v -c -d /dev/$disk -p $esp -L "Alter Linux $VER" -l $efidir/$bootefi > /dev/tty4 2>&1
 	fi
 
 	#try_upgrade hd/$asrc
