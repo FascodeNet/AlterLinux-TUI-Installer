@@ -592,3 +592,4 @@ do_install()
 			;;
 	esac
 }
+do_install
