@@ -552,6 +552,8 @@ install_hd()
 
 do_install()
 {
+	cat $dev
+	exit 1
 	booted_from=`basename $dev`
 	efi=$(cat /sys/firmware/efi/fw_platform_size 2> /dev/null)
 	[ -n "$efi" ] && mount -t efivarfs none /sys/firmware/efi/efivars
@@ -593,19 +595,25 @@ do_install()
 	esac
 }
 
-auto_detect()
+check_root()
 {
-	tmp=/tmp/dev2mod
-	echo 'dev2mod() { while read dev; do case $dev in' > $tmp
-	sort -r /lib/modules/`uname -r`/modules.alias | \
-		sed -n 's/[()]/*/g; s/^alias  *\([^ ]*\)  *\(.*\)/\1)modprobe \2;;/p' >> $tmp
-	echo 'esac; done; }' >> $tmp
-	for f in $(grep -Eh "drm_kms|sound.core|hyperv" /lib/modules/`uname -r`/modules.dep | cut -d. -f1); do
-		sed -i "/$(basename $f | sed 's/-/_/g')/d" $tmp
-	done
-	source $tmp
-	cat /sys/bus/*/devices/*/uevent | grep MODALIAS | sed 's/^MODALIAS=//' | awk '!seen[$0]++' | dev2mod
-	cat /sys/devices/virtual/wmi/*/modalias | dev2mod
+	if [ "`dirname $1`" = "/dev" ]; then
+		[ -e $1 ] || return 1
+		blk=`basename $1`
+		[ ! -e /dev/block/$blk ] && ln $1 /dev/block
+		dev=/dev/block/$blk
+	else
+		dev=$1
+	fi
+	echo " found at $1"
 }
-auto_detect
+
+while :; do
+	for device in ${ROOT:-/dev/[hmnsv][dmrv][0-9a-z]*}; do
+		check_root $device && break 2
+		mountpoint -q /mnt && umount /mnt
+	done
+	sleep 1
+	echo -n .
+done
 do_install
