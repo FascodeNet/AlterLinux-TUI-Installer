@@ -552,8 +552,7 @@ install_hd()
 
 do_install()
 {
-	cat $dev
-	exit 1
+	echo $dev
 	booted_from=`basename $dev`
 	efi=$(cat /sys/firmware/efi/fw_platform_size 2> /dev/null)
 	[ -n "$efi" ] && mount -t efivarfs none /sys/firmware/efi/efivars
@@ -609,9 +608,8 @@ check_root()
 }
 
 while :; do
-	for device in ${ROOT:-/dev/[hmnsv][dmrv][0-9a-z]*}; do
+	for device in ${ROOT:-/dev/[hmsv][dmrv][0-9a-z]*}; do
 		check_root $device && break 2
-		mountpoint -q /mnt && umount /mnt
 	done
 	sleep 1
 	echo -n .
