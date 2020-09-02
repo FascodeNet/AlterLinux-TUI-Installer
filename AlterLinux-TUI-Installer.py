@@ -30,9 +30,13 @@ def key_layout_select(main_dialog):
     for layouts_s in key_layouts_str:
         key_layouts_menu.append((layouts_s,""))
     while(True):
-        code,tag = main_dialog.menu("Select your key layout",
+        code,tag = main_dialog.menu("Select your keyboard layout.",
         choices = key_layouts_menu)
         if code == main_dialog.OK:
+            if main_dialog.yesno("Is \"{}\" correct?".format(tag)) == main_dialog.OK:
+                return tag
+            else:
+                continue
             return tag
         else:
             ask_sure_to_exit(main_dialog)
@@ -55,23 +59,27 @@ def hdd_select(main_dialog):
     for insthdd in can_install_hdds_Str:
         can_installhdds.append((insthdd,""))
     while(True):
-        code,tag = main_dialog.menu("Which HDD do you install?",
+        code,tag = main_dialog.menu("Which HDD do you want to install?",
         choices  = can_installhdds)
         if code == main_dialog.OK:
-            return tag
+            if main_dialog.yesno("Do you want to install in \"{}\" ?".format(tag)) == main_dialog.OK:
+                return tag
+            else:
+                continue
         else:
             ask_sure_to_exit(main_dialog)
             continue
 
-
+# main
 def main():
     main_dialog = Dialog(dialog="dialog")
     main_dialog.setBackgroundTitle("Alter Linux Installer")
     if main_dialog.yesno("Install Alter Linux?") == main_dialog.OK:
-        key_lay=key_layout_select(main_dialog)
-        main_dialog.msgbox(key_lay)
-        hdd_current=hdd_select(main_dialog)
-        main_dialog.msgbox(hdd_current)
+        # get keyboard layout
+        key_layout = key_layout_select(main_dialog)
+        # get install target hdd
+        hdd_current = hdd_select(main_dialog)
+        finish()
     else:
         finish()
 
