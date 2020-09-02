@@ -7,6 +7,15 @@ import re
 hdds_re=re.compile(r"^/dev/[hsnm][dmv].[1234567890eb].*$")
 
 
+def finish():
+    subprocess.call("clear")
+    exit(0)
+
+def ask_sure_to_exit(main_dialog):
+    if main_dialog.yesno("Are you sure to exit?") == main_dialog.OK:
+        finish()
+
+
 def get_hdds():
     resultkun    = subprocess.check_output("lsblk -pln -o NAME",stdin=DEVNULL,stderr=DEVNULL,shell=True)
     reskun       = resultkun.decode()
@@ -36,6 +45,7 @@ def key_layout_select(main_dialog):
         if code == main_dialog.OK:
             return tag
         else:
+            ask_sure_to_exit(main_dialog)
             continue
 
 def hdd_select(main_dialog):
@@ -49,6 +59,7 @@ def hdd_select(main_dialog):
         if code == main_dialog.OK:
             return tag
         else:
+            ask_sure_to_exit(main_dialog)
             continue
 
 
@@ -61,8 +72,7 @@ def main():
         hdd_current=hdd_select(main_dialog)
         main_dialog.msgbox(hdd_current)
     else:
-        pass
+        finish()
 
 
 main()
-subprocess.call("clear")
