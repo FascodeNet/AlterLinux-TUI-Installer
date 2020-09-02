@@ -15,17 +15,7 @@ def ask_sure_to_exit(main_dialog):
     if main_dialog.yesno("Are you sure to exit?") == main_dialog.OK:
         finish()
 
-
-def get_hdds():
-    resultkun    = subprocess.check_output("lsblk -pln -o NAME",stdin=DEVNULL,stderr=DEVNULL,shell=True)
-    reskun       = resultkun.decode()
-    str_listkun  = []
-    for strkun in reskun.split("\n"):
-        matchkun = hdds_re.match(strkun)
-        if not matchkun is None:
-            str_listkun.append(matchkun.group())
-    return str_listkun
-
+# Keyboard layout
 def get_key_layouts():
     resultkun = subprocess.check_output("localectl list-keymaps",stdin=DEVNULL,stderr=DEVNULL,shell=True)
     reskun    = resultkun.decode()
@@ -40,13 +30,24 @@ def key_layout_select(main_dialog):
     for layouts_s in key_layouts_str:
         key_layouts_menu.append((layouts_s,""))
     while(True):
-        code,tag = main_dialog.menu("Select your key layout"
-        ,choices = key_layouts_menu)
+        code,tag = main_dialog.menu("Select your key layout",
+        choices = key_layouts_menu)
         if code == main_dialog.OK:
             return tag
         else:
             ask_sure_to_exit(main_dialog)
             continue
+
+# HDD
+def get_hdds():
+    resultkun    = subprocess.check_output("lsblk -pln -o NAME",stdin=DEVNULL,stderr=DEVNULL,shell=True)
+    reskun       = resultkun.decode()
+    str_listkun  = []
+    for strkun in reskun.split("\n"):
+        matchkun = hdds_re.match(strkun)
+        if not matchkun is None:
+            str_listkun.append(matchkun.group())
+    return str_listkun
 
 def hdd_select(main_dialog):
     can_install_hdds_Str = get_hdds()
