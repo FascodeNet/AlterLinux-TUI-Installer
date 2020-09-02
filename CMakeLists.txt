@@ -1,0 +1,5 @@
+cmake_minimum_required(VERSION 2.8)
+project(alterlinux-tui-installer CXX)
+set(CMAKE_C_COMPILER "/usr/bin/clang" CACHE string "clang compiler" FORCE)
+set(CMAKE_CXX_COMPILER "/usr/bin/clang++" CACHE string "clang++ compiler" FORCE)
+add_executable(alterlinux-tui-installer main.cpp)
