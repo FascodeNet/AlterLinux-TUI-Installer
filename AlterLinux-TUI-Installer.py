@@ -4,7 +4,7 @@ import subprocess
 from subprocess import DEVNULL
 from dialog import Dialog
 import re
-hdds_re=re.compile(r"^/dev/[hsn][dv].[1234567890e].*$")
+hdds_re=re.compile(r"^/dev/[hsnm][dmv].[1234567890eb].*$")
 def get_hdds():
 
     resultkun=subprocess.check_output("lsblk -pln -o NAME",stdin=DEVNULL,stderr=DEVNULL,shell=True)
