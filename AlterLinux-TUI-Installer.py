@@ -105,14 +105,26 @@ def main():
     main_dialog = Dialog(dialog="dialog")
     main_dialog.setBackgroundTitle("Alter Linux Installer")
     if main_dialog.yesno("Install Alter Linux?") == main_dialog.OK:
+        conf_str     = "Start the installation with the following settings.\nAre you sure?\n\n"
         # get keyboard layout
         key_layout   = key_layout_select(main_dialog)
+        conf_str    += "Keyboard layout : {}\n".format(key_layout)
         # get install target hdd
         hdd_target   = hdd_select(main_dialog)
+        conf_str    += "Install target partition : {}\n".format(hdd_target)
         # set user data
         user_name    = input_dialog(main_dialog, "What is your user name?",)
+        conf_str    += "User name : {}\n".format(user_name)
         # set host name
         host_name    = input_dialog(main_dialog, "What is the name of this computer?")
+        conf_str    += "Host name : {}\n".format(host_name)
+        # Confirmation
+        while(True):
+            if main_dialog.yesno(conf_str,height=15,width=50) == main_dialog.OK:
+                pass
+            else:
+                ask_sure_to_exit(main_dialog)
+                continue
         finish()
     else:
         finish()
