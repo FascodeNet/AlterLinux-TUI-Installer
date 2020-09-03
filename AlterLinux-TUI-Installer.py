@@ -8,7 +8,7 @@ hdds_re = re.compile(r"^/dev/[hsnm][dmv].[1234567890eb].*$")
 
 
 def finish():
-    subprocess.call("clear")
+    #subprocess.call("clear")
     exit(0)
 
 def ask_sure_to_exit(main_dialog):
