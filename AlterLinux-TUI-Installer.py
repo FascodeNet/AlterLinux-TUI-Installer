@@ -125,6 +125,14 @@ def hdd_select(main_dialog):
             ask_sure_to_exit(main_dialog)
             continue
 
+# install
+def install():
+    subprocess.call("clear")
+    print("Alter Linux installation in progress...")
+    subprocess.call((
+    "sudo","unsquashfs","/run/archiso/bootmnt/alter/x86_64/airootfs.sfs"
+    ))
+
 # main
 def main():
     main_dialog      = Dialog(dialog="dialog")
@@ -153,9 +161,8 @@ def main():
             else:
                 ask_sure_to_exit(main_dialog)
                 continue
-        finish()
-    else:
-        finish()
+        install()
+    finish()
 
 
 main()
