@@ -138,8 +138,9 @@ def install(key_layout, target_partition, user_name, host_name, user_pass, root_
     print("[debug]  mount finish")
     # unsquashfs
     airootfs_path = subprocess.check_output((
-        "find", "/run/archiso/bootmnt", "-name", "airootfs.sfs"
-    ))
+        "find", "/run/archiso/bootmnt", "-name", "airootfs.sfs"),
+        stdin=DEVNULL, stderr=DEVNULL,shell=True
+    )
     print("[debug]  airootfs is {}".format(airootfs_path))
     print("[debug]  unsquashfs start...")
     print((
