@@ -129,13 +129,20 @@ def hdd_select(main_dialog):
 def install(key_layout, target_partition, user_name, host_name, user_pass, root_pass):
     subprocess.call("clear")
     print("Alter Linux installation in progress...")
-    subprocess.call(("sudo", "mkfs.ext4", target_partition, "-F"))
-    subprocess.call("mkdir /tmp/alter-install")
+    # format
+    subprocess.call(("sudo",  "mkfs.ext4", target_partition, "-F"))
+    subprocess.call(("mkdir", "/tmp/alter-install"))
     subprocess.call(("sudo", "mount", target_partition, "/tmp/alter-install"))
-    airootfs_path = subprocess.check_output("find /run/archiso/bootmnt -name airootfs.sfs")
-    subprocess.call((
-    "sudo","unsquashfs",airootfs_path,"/tmp/alter-install"
+    # unsquashfs
+    airootfs_path = subprocess.check_output((
+        "find", "/run/archiso/bootmnt", "-name", "airootfs.sfs"
     ))
+    subprocess.call((
+        "sudo","unsquashfs",airootfs_path,"/tmp/alter-install"
+    ))
+    # clean up
+    subprocess.call(("sudo", "umount", target_partition))
+    subprocess.call(("rm", "-rf", "/tmp/alter-install"))
 
 # main
 def main():
