@@ -15,6 +15,16 @@ def ask_sure_to_exit(main_dialog):
     if main_dialog.yesno("Are you sure to exit?") == main_dialog.OK:
         finish()
 
+def input_dialog(main_dialog, txt):
+    while (True):
+        result = main_dialog.inputbox(txt,width=50)
+        if result[0] != "ok" or result[1] == "":
+            continue
+        if result[1] == "cancel":
+            ask_sure_to_exit(main_dialog)
+            continue
+        return result[1]
+
 # Keyboard layout
 def get_key_layouts():
     resultkun = subprocess.check_output("localectl list-keymaps", stdin=DEVNULL, stderr=DEVNULL,shell=True)
@@ -31,7 +41,7 @@ def key_layout_select(main_dialog):
         key_layouts_menu.append((layouts_s,""))
     while(True):
         code,tag = main_dialog.menu("Select your keyboard layout.",
-        choices = key_layouts_menu)
+        choices  = key_layouts_menu)
         if code == main_dialog.OK:
             if main_dialog.yesno("Is \"{}\" correct?".format(tag)) == main_dialog.OK:
                 return tag
@@ -96,9 +106,13 @@ def main():
     main_dialog.setBackgroundTitle("Alter Linux Installer")
     if main_dialog.yesno("Install Alter Linux?") == main_dialog.OK:
         # get keyboard layout
-        key_layout = key_layout_select(main_dialog)
+        key_layout   = key_layout_select(main_dialog)
         # get install target hdd
-        hdd_current = hdd_select(main_dialog)
+        hdd_target   = hdd_select(main_dialog)
+        # set user data
+        user_name    = input_dialog(main_dialog, "What is your user name?",)
+        # set host name
+        host_name    = input_dialog(main_dialog, "What is the name of this computer?")
         finish()
     else:
         finish()
