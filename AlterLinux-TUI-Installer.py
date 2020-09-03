@@ -138,16 +138,12 @@ def install(key_layout, target_partition, user_name, host_name, user_pass, root_
     print("[debug]  mount finish")
     # unsquashfs
     airootfs_path = subprocess.check_output((
-        "find", "/run/archiso/bootmnt", "-name", "airootfs.sfs"),
-        stdin=DEVNULL, stderr=DEVNULL,shell=True
-    )
+        "find", "/run/archiso/bootmnt", "-name", "airootfs.sfs"
+    ))
     print("[debug]  airootfs is {}".format(airootfs_path))
     print("[debug]  unsquashfs start...")
-    print((
-        "sudo", "unsquashfs", airootfs_path.rstrip("\n"), "/tmp/alter-install"
-    ))
     subprocess.call((
-        "sudo", "unsquashfs", airootfs_path.rstrip("\n"), "/tmp/alter-install"
+        "sudo", "unsquashfs", airootfs_path.decode(), "/tmp/alter-install"
     ))
     print("[debug]  unsquashfs finish")
     # clean up
