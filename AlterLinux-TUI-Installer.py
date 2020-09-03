@@ -126,34 +126,38 @@ def hdd_select(main_dialog):
             continue
 
 # install
-def install():
+def install(key_layout, target_partition, user_name, host_name, user_pass, root_pass):
     subprocess.call("clear")
     print("Alter Linux installation in progress...")
+    subprocess.call(("sudo", "mkfs.ext4", target_partition, "-F"))
+    subprocess.call("mkdir /tmp/alter-install")
+    subprocess.call(("sudo", "mount", target_partition, "/tmp/alter-install"))
+    airootfs_path = subprocess.check_output("find /run/archiso/bootmnt -name airootfs.sfs")
     subprocess.call((
-    "sudo","unsquashfs","/run/archiso/bootmnt/alter/x86_64/airootfs.sfs"
+    "sudo","unsquashfs",airootfs_path,"/tmp/alter-install"
     ))
 
 # main
 def main():
-    main_dialog      = Dialog(dialog="dialog")
+    main_dialog          = Dialog(dialog="dialog")
     main_dialog.setBackgroundTitle("Alter Linux Installer")
     if main_dialog.yesno("Install Alter Linux?") == main_dialog.OK:
-        conf_str     = "Start the installation with the following settings.\nAre you sure?\n\n"
+        conf_str         = "Start the installation with the following settings.\nAre you sure?\n\n"
         # get keyboard layout
-        key_layout   = key_layout_select(main_dialog)
-        conf_str    += "Keyboard layout : {}\n".format(key_layout)
+        key_layout       = key_layout_select(main_dialog)
+        conf_str        += "Keyboard layout : {}\n".format(key_layout)
         # get install target hdd
-        hdd_target   = hdd_select(main_dialog)
-        conf_str    += "Install target partition : {}\n".format(hdd_target)
+        target_partition = hdd_select(main_dialog)
+        conf_str        += "Install target partition : {}\n".format(target_partition)
         # set user data
-        user_name    = input_dialog(main_dialog, "What is your user name?",)
-        conf_str    += "User name : {}\n".format(user_name)
+        user_name        = input_dialog(main_dialog, "What is your user name?",)
+        conf_str        += "User name : {}\n".format(user_name)
         # set host name
-        host_name    = input_dialog(main_dialog, "What is the name of this computer?")
-        conf_str    += "Host name : {}\n".format(host_name)
+        host_name        = input_dialog(main_dialog, "What is the name of this computer?")
+        conf_str        += "Host name : {}\n".format(host_name)
         # password
-        user_pass    = password_dialog(main_dialog, "Type a safely password.",)
-        root_pass    = password_dialog(main_dialog, "Type a safely password for administrator account.")
+        user_pass        = password_dialog(main_dialog, "Type a safely password.",)
+        root_pass        = password_dialog(main_dialog, "Type a safely password for administrator account.")
         # Confirmation
         while(True):
             if main_dialog.yesno(conf_str,height=15,width=50) == main_dialog.OK:
@@ -161,7 +165,7 @@ def main():
             else:
                 ask_sure_to_exit(main_dialog)
                 continue
-        install()
+        install(key_layout, target_partition, user_name, host_name, user_pass, root_pass)
     finish()
 
 
