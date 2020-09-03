@@ -140,7 +140,7 @@ def install(key_layout, target_partition, user_name, host_name, user_pass, root_
     airootfs_path = subprocess.check_output((
         "find", "/run/archiso/bootmnt", "-name", "airootfs.sfs"
     ))
-    print("[debug]  airootfs is "+airootfs_path)
+    print("[debug]  airootfs is {}".format(airootfs_path))
     print("[debug]  unsquashfs start...")
     print((
         "sudo", "unsquashfs", airootfs_path, "/tmp/alter-install"
