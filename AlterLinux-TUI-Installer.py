@@ -1,9 +1,9 @@
 #!/usr/bin/env python
+import re
 import locale
 import subprocess
-from subprocess import DEVNULL
-from dialog import Dialog
-import re
+from   subprocess import DEVNULL
+from   dialog     import Dialog
 hdds_re = re.compile(r"^/dev/[hsnm][dmv].[1234567890eb].*$")
 
 
@@ -45,26 +45,26 @@ def password_dialog(main_dialog, txt):
         if result[1] != re_result[1]:
             main_dialog.msgbox("Error\n\nPassword doesn't match")
             continue
-
         return result[1]
 
 # Keyboard layout
 def get_key_layouts():
-    resultkun = subprocess.check_output("localectl list-keymaps", stdin=DEVNULL, stderr=DEVNULL,shell=True)
-    reskun    = resultkun.decode()
-    str_lskun = []
-    for strkun in reskun.split("\n"):
-        str_lskun.append(strkun)
-    return str_lskun
+    tmp      = subprocess.check_output("localectl list-keymaps",
+    stdin=DEVNULL, stderr=DEVNULL,shell=True)
+    result   = tmp.decode()
+    str_list = []
+    for element in result.split("\n"):
+        str_list.append(element)
+    return str_list
 
 def key_layout_select(main_dialog):
     key_layouts_str  = get_key_layouts()
-    key_layouts_menu = []
+    key_layout_list  = []
     for layouts_s in key_layouts_str:
-        key_layouts_menu.append((layouts_s,""))
+        key_layout_list.append((layouts_s,""))
     while(True):
         code,tag = main_dialog.menu("Select your keyboard layout.",
-        choices  = key_layouts_menu)
+        choices  = key_layout_list)
         if code == main_dialog.OK:
             if main_dialog.yesno("Is \"{}\" correct?".format(tag)) == main_dialog.OK:
                 return tag
@@ -77,31 +77,33 @@ def key_layout_select(main_dialog):
 
 # HDD
 def get_editable_disk():
-    tmp           = subprocess.check_output("lsblk -dpln -o NAME", stdin=DEVNULL, stderr=DEVNULL, shell=True)
+    tmp           = subprocess.check_output("lsblk -dpln -o NAME",
+    stdin=DEVNULL, stderr=DEVNULL, shell=True)
     disk_list     = tmp.decode()
     str_disk_list = disk_list.split("\n")
     return str_disk_list
 
 def target_diskedit_select(main_dialog):
-    editable_disk_str = get_editable_disk()
-    editable_disk = []
+    editable_disk_str  = get_editable_disk()
+    editable_disk_list = []
     for disk in editable_disk_str:
-        editable_disk.append((disk, ""))
+        editable_disk_list.append((disk, ""))
     code,tag = main_dialog.menu("Which disk do you want to edit?",
-    choices=editable_disk)
+    choices=editable_disk_list)
     if code == main_dialog.OK:
-        subprocess.call(("sudo","cfdisk",tag))#.format(tag))
+        subprocess.call(("sudo","cfdisk",tag))
 
 def get_target_partition():
-    resultkun    = subprocess.check_output("lsblk -pln -o NAME", stdin=DEVNULL, stderr=DEVNULL,shell=True)
-    reskun       = resultkun.decode()
-    str_listkun  = []
-    str_listkun.append("Edit the partitions manually")
-    for strkun in reskun.split("\n"):
+    tmp                = subprocess.check_output("lsblk -pln -o NAME",
+    stdin=DEVNULL, stderr=DEVNULL,shell=True)
+    partition_list     = tmp.decode()
+    str_partition_list = []
+    str_partition_list.append("Edit the partitions manually")
+    for strkun in partition_list.split("\n"):
         matchkun = hdds_re.match(strkun)
         if not matchkun is None:
-            str_listkun.append(matchkun.group())
-    return str_listkun
+            str_partition_list.append(matchkun.group())
+    return str_partition_list
 
 def hdd_select(main_dialog):
     can_install_partition_str = get_target_partition()
@@ -125,7 +127,7 @@ def hdd_select(main_dialog):
 
 # main
 def main():
-    main_dialog = Dialog(dialog="dialog")
+    main_dialog      = Dialog(dialog="dialog")
     main_dialog.setBackgroundTitle("Alter Linux Installer")
     if main_dialog.yesno("Install Alter Linux?") == main_dialog.OK:
         conf_str     = "Start the installation with the following settings.\nAre you sure?\n\n"
@@ -147,7 +149,7 @@ def main():
         # Confirmation
         while(True):
             if main_dialog.yesno(conf_str,height=15,width=50) == main_dialog.OK:
-                pass
+                break
             else:
                 ask_sure_to_exit(main_dialog)
                 continue
