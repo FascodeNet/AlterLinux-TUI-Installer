@@ -30,10 +30,22 @@ def input_dialog(main_dialog, txt):
             continue
         return result[1]
 
+def password_dialog(main_dialog, txt):
+    while (True):
+        result = main_dialog.passwordbox(txt, width=50, insecure=True)
+        if was_input_success(main_dialog, result) == False:
             continue
-        if result[1] == "cancel":
-            ask_sure_to_exit(main_dialog)
+        while(True):
+            re_result = main_dialog.passwordbox("Enter the same password again.",
+            width=40, insecure=True)
+            if was_input_success(main_dialog, re_result) == False:
+                continue
+            else:
+                break
+        if result[1] != re_result[1]:
+            main_dialog.msgbox("Error\n\nPassword doesn't match")
             continue
+
         return result[1]
 
 # Keyboard layout
@@ -129,6 +141,9 @@ def main():
         # set host name
         host_name    = input_dialog(main_dialog, "What is the name of this computer?")
         conf_str    += "Host name : {}\n".format(host_name)
+        # password
+        user_pass    = password_dialog(main_dialog, "Type a safely password.",)
+        root_pass    = password_dialog(main_dialog, "Type a safely password for administrator account.")
         # Confirmation
         while(True):
             if main_dialog.yesno(conf_str,height=15,width=50) == main_dialog.OK:
