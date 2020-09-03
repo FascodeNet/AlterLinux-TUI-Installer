@@ -131,26 +131,18 @@ def install(key_layout, target_partition, user_name, host_name, user_pass, root_
     print("Alter Linux installation in progress...")
     # format
     subprocess.call(("sudo", "mkfs.ext4", target_partition, "-F"))
-    print("[debug]  format finish")
     subprocess.call(("mkdir", "/tmp/alter-install"))
-    print("[debug]  mkdir finish")
     subprocess.call(("sudo", "mount", target_partition, "/tmp/alter-install"))
-    print("[debug]  mount finish")
     # unsquashfs
     airootfs_path = subprocess.check_output((
         "find", "/run/archiso/bootmnt", "-name", "airootfs.sfs"
     ))
-    print("[debug]  airootfs is {}".format(airootfs_path))
-    print("[debug]  unsquashfs start...")
     subprocess.call((
         "sudo", "unsquashfs", airootfs_path.decode().rstrip("\n"), "/tmp/alter-install"
     ))
-    print("[debug]  unsquashfs finish")
     # clean up
     subprocess.call(("sudo", "umount", target_partition))
-    print("[debug]  umount finish")
     subprocess.call(("rm", "-rf", "/tmp/alter-install"))
-    print("[debug]  remove tmp directory finish")
 
 # main
 def main():
