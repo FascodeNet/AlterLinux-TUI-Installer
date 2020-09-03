@@ -143,7 +143,7 @@ def install(key_layout, target_partition, user_name, host_name, user_pass, root_
     print("[debug]  airootfs is {}".format(airootfs_path))
     print("[debug]  unsquashfs start...")
     subprocess.call((
-        "sudo", "unsquashfs", airootfs_path.decode(), "/tmp/alter-install"
+        "sudo", "unsquashfs", airootfs_path.decode().rstrip("\n"), "/tmp/alter-install"
     ))
     print("[debug]  unsquashfs finish")
     # clean up
