@@ -15,13 +15,18 @@ def ask_sure_to_exit(main_dialog):
     if main_dialog.yesno("Are you sure to exit?") == main_dialog.OK:
         finish()
 
+def was_input_success(main_dialog, input_str):
+    if input_str[0] == "cancel":
+        ask_sure_to_exit(main_dialog)
+        return False
+    if input_str[1] == "":
+        return False
+    return True
+
 def input_dialog(main_dialog, txt):
     while (True):
-        result = main_dialog.inputbox(txt,width=50)
-        if result[0] == "cancel":
-            ask_sure_to_exit(main_dialog)
-            continue
-        if result[1] == "":
+        result = main_dialog.inputbox(txt, width=50)
+        if was_input_success(main_dialog, result) == False:
             continue
         return result[1]
 
