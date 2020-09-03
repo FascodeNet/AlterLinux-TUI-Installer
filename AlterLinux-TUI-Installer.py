@@ -18,7 +18,13 @@ def ask_sure_to_exit(main_dialog):
 def input_dialog(main_dialog, txt):
     while (True):
         result = main_dialog.inputbox(txt,width=50)
-        if result[0] != "ok" or result[1] == "":
+        if result[0] == "cancel":
+            ask_sure_to_exit(main_dialog)
+            continue
+        if result[1] == "":
+            continue
+        return result[1]
+
             continue
         if result[1] == "cancel":
             ask_sure_to_exit(main_dialog)
