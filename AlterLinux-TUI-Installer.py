@@ -126,6 +126,7 @@ def hdd_select(main_dialog):
             continue
 
 # install
+
 def install(key_layout, target_partition, user_name, host_name, user_pass, root_pass):
     subprocess.call("clear")
     print("Alter Linux installation in progress...")
@@ -140,9 +141,29 @@ def install(key_layout, target_partition, user_name, host_name, user_pass, root_
     subprocess.call((
         "sudo", "unsquashfs", "-f", "-d", "/tmp/alter-inst", airootfs_path.decode().rstrip("\n"),
     ))
+    # remove settings and files for live boot
+    need_remove_files = [
+        "/usr/share/calamares/",
+        "/root/.automated_script.sh",
+        "/root/Desktop/calamares.desktop",
+        "/etc/initcpio",
+        "/etc/skel/Desktop",
+        "/etc/skel/.config/gtk-3.0/bookmarks",
+        "/etc/polkit-1/rules.d/01-nopasswork.rules",
+        "/etc/sudoers.d/alterlive",
+        "/etc/mkinitcpio-archiso.conf",
+        "/etc/udev/rules.d/81-dhcpcd.rules",
+        "/etc/systemd/system/getty@tty1.service.d",
+        "/etc/systemd/system/getty@tty1.service.d/autologin.conf",
+    ]
+    for files in need_remove_files:
+        subprocess.call(("sudo", "arch-chroot", "/tmp/alter-install", "rm", "-rf", files))
+    subprocess.call(("sudo", "arch-chroot", "/tmp/alter-install", "userdel", "-r", "alter"))
+    subprocess.call(("sudo", "arch-chroot", "/tmp/alter-install", "sed", "-i", "\'s/Storage=volatile/#Storage=auto/\' /etc/systemd/journald.conf"))
     # clean up
     subprocess.call(("sudo", "umount", target_partition))
     subprocess.call(("rm", "-rf", "/tmp/alter-install"))
+    print("Alter Linux installation completed!")
 
 # main
 def main():
