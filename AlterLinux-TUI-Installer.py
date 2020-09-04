@@ -135,12 +135,10 @@ def install(key_layout, target_partition, user_name, host_name, user_pass, root_
     subprocess.run(("mkdir", "/tmp/alter-install"))
     subprocess.run(("sudo", "mount", target_partition, "/tmp/alter-install"))
     # unsquashfs
-    airootfs_path = subprocess.check_output((
-        "find", "/run/archiso/bootmnt", "-name", "airootfs.sfs"
-    ))
-    subprocess.run((
-        "sudo", "unsquashfs", "-f", "-d", "/tmp/alter-inst", airootfs_path.decode().rstrip("\n"),
-    ))
+    airootfs_path = subprocess.check_output(
+        ("find", "/run/archiso/bootmnt", "-name", "airootfs.sfs"),
+        text=True)
+    subprocess.run(("sudo", "unsquashfs", "-f", "-d", "/tmp/alter-inst", airootfs_path))
     # remove settings and files for live boot
     need_remove_files = [
         "/usr/share/calamares/",
