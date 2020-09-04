@@ -138,7 +138,7 @@ def install(key_layout, target_partition, user_name, host_name, user_pass, root_
         "find", "/run/archiso/bootmnt", "-name", "airootfs.sfs"
     ))
     subprocess.call((
-        "sudo", "unsquashfs", airootfs_path.decode().rstrip("\n"), "/tmp/alter-install"
+        "sudo", "unsquashfs", "-f", "-d", "/tmp/alter-inst", airootfs_path.decode().rstrip("\n"),
     ))
     # clean up
     subprocess.call(("sudo", "umount", target_partition))
