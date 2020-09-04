@@ -49,8 +49,8 @@ def password_dialog(main_dialog, txt):
 
 # Keyboard layout
 def get_key_layouts():
-    tmp      = subprocess.check_output("localectl list-keymaps",
-    stdin=DEVNULL, stderr=DEVNULL,shell=True)
+    tmp      = subprocess.check_output(["localectl","list-keymaps"],
+    stdin=DEVNULL, stderr=DEVNULL)
     result   = tmp.decode()
     str_list = []
     for element in result.split("\n"):
@@ -77,8 +77,8 @@ def key_layout_select(main_dialog):
 
 # HDD
 def get_editable_disk():
-    tmp           = subprocess.check_output("lsblk -dpln -o NAME",
-    stdin=DEVNULL, stderr=DEVNULL, shell=True)
+    tmp           = subprocess.check_output(["lsblk","-dpln","-o","NAME"],
+    stdin=DEVNULL, stderr=DEVNULL)
     disk_list     = tmp.decode()
     str_disk_list = disk_list.split("\n")
     return str_disk_list
@@ -94,8 +94,8 @@ def target_diskedit_select(main_dialog):
         subprocess.run(("sudo","cfdisk",tag))
 
 def get_target_partition():
-    tmp                = subprocess.check_output("lsblk -pln -o NAME",
-    stdin=DEVNULL, stderr=DEVNULL,shell=True)
+    tmp                = subprocess.check_output(["lsblk","-pln","-o","NAME"],
+    stdin=DEVNULL, stderr=DEVNULL)
     partition_list     = tmp.decode()
     str_partition_list = []
     str_partition_list.append("Edit the partitions manually")
@@ -131,14 +131,14 @@ def install(key_layout, target_partition, user_name, host_name, user_pass, root_
     subprocess.run("clear")
     print("Alter Linux installation in progress...")
     # format
-    subprocess.run(("sudo", "mkfs.ext4", target_partition, "-F"))
+    subprocess.run(("mkfs.ext4", target_partition, "-F"))
     subprocess.run(("mkdir", "/tmp/alter-install"))
-    subprocess.run(("sudo", "mount", target_partition, "/tmp/alter-install"))
+    subprocess.run(( "mount", target_partition, "/tmp/alter-install"))
     # unsquashfs
     airootfs_path = subprocess.check_output(
         ("find", "/run/archiso/bootmnt", "-name", "airootfs.sfs"),
         text=True)
-    subprocess.run(("sudo", "unsquashfs", "-f", "-d", "/tmp/alter-inst", airootfs_path.rstrip("\n")))
+    subprocess.run(( "unsquashfs", "-f", "-d", "/tmp/alter-inst", airootfs_path.rstrip("\n")))
     # remove settings and files for live boot
     need_remove_files = [
         "/usr/share/calamares/",
@@ -155,11 +155,11 @@ def install(key_layout, target_partition, user_name, host_name, user_pass, root_
         "/etc/systemd/system/getty@tty1.service.d/autologin.conf",
     ]
     for files in need_remove_files:
-        subprocess.run(("sudo", "arch-chroot", "/tmp/alter-install", "rm", "-rf", files))
-    subprocess.run(("sudo", "arch-chroot", "/tmp/alter-install", "userdel", "-r", "alter"))
-    subprocess.run(("sudo", "arch-chroot", "/tmp/alter-install", "sed", "-i", "\'s/Storage=volatile/#Storage=auto/\' /etc/systemd/journald.conf"))
+        subprocess.run(("arch-chroot", "/tmp/alter-install", "rm", "-rf", files))
+    subprocess.run(("arch-chroot", "/tmp/alter-install", "userdel", "-r", "alter"))
+    subprocess.run(("arch-chroot", "/tmp/alter-install", "sed", "-i", "\'s/Storage=volatile/#Storage=auto/\' /etc/systemd/journald.conf"))
     # clean up
-    subprocess.run(("sudo", "umount", target_partition))
+    subprocess.run(("umount", target_partition))
     subprocess.run(("rm", "-rf", "/tmp/alter-install"))
     print("Alter Linux installation completed!")
 
