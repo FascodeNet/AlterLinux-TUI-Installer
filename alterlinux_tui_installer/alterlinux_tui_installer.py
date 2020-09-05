@@ -5,6 +5,8 @@ import gettext
 import subprocess
 from   subprocess import DEVNULL, STDOUT
 from sys import stdin, stdout
+import os
+import shutil
 from   dialog     import Dialog
 hdds_re = re.compile(r"^/dev/[hsnm][dmv].[1234567890eb].*$")
 
@@ -184,6 +186,13 @@ def install(key_layout, target_partition, user_name, host_name, user_pass, root_
         ["find", "/run/archiso/bootmnt", "-name", "airootfs.sfs"],
         text=True)
     subprocess.run(["unsquashfs", "-f", "-d", "/tmp/alter-install", airootfs_path.rstrip("\n")])
+    #kernel copy
+    kernel_release_ver=os.uname().release
+    kernel_path="/usr/lib/modules/" + kernel_release_ver + "/vmlinuz"
+    shutil.copy2(kernel_path,"/boot/vmlinuz-linux")
+    #mkinitcpio
+    subprocess.run(["mkinitcpio","-P"])
+    #grub install
     install_grub_efi(main_dialog,target_partition)
     # remove settings and files for live boot
     need_remove_files = [
