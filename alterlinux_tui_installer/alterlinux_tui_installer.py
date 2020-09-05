@@ -159,7 +159,7 @@ def install_grub_efi(main_dialog:Dialog,partition_path):
         else:
             if main_dialog.yesno("Format EFI System Partition?") == main_dialog.OK:
                 subprocess.run(["mkfs.fat","-F32",eps_dev_path])
-                continue
+                break
             else:
                 ask_sure_to_exit(main_dialog)
                 continue
