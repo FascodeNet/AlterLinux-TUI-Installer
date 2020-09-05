@@ -91,7 +91,7 @@ def target_diskedit_select(main_dialog):
     code,tag = main_dialog.menu("Which disk do you want to edit?",
     choices=editable_disk_list)
     if code == main_dialog.OK:
-        subprocess.run(("sudo","cfdisk",tag))
+        subprocess.run(["sudo","cfdisk",tag])
 
 def get_target_partition():
     tmp                = subprocess.check_output(["lsblk","-pln","-o","NAME"],
@@ -131,14 +131,14 @@ def install(key_layout, target_partition, user_name, host_name, user_pass, root_
     subprocess.run("clear")
     print("Alter Linux installation in progress...")
     # format
-    subprocess.run(("mkfs.ext4", target_partition, "-F"))
-    subprocess.run(("mkdir", "/tmp/alter-install"))
-    subprocess.run(( "mount", target_partition, "/tmp/alter-install"))
+    subprocess.run(["mkfs.ext4", target_partition, "-F"])
+    subprocess.run(["mkdir", "/tmp/alter-install"])
+    subprocess.run(["mount", target_partition, "/tmp/alter-install"])
     # unsquashfs
     airootfs_path = subprocess.check_output(
-        ("find", "/run/archiso/bootmnt", "-name", "airootfs.sfs"),
+        ["find", "/run/archiso/bootmnt", "-name", "airootfs.sfs"],
         text=True)
-    subprocess.run(( "unsquashfs", "-f", "-d", "/tmp/alter-inst", airootfs_path.rstrip("\n")))
+    subprocess.run(["unsquashfs", "-f", "-d", "/tmp/alter-inst", airootfs_path.rstrip("\n")])
     # remove settings and files for live boot
     need_remove_files = [
         "/usr/share/calamares/",
@@ -155,12 +155,12 @@ def install(key_layout, target_partition, user_name, host_name, user_pass, root_
         "/etc/systemd/system/getty@tty1.service.d/autologin.conf",
     ]
     for files in need_remove_files:
-        subprocess.run(("arch-chroot", "/tmp/alter-install", "rm", "-rf", files))
-    subprocess.run(("arch-chroot", "/tmp/alter-install", "userdel", "-r", "alter"))
-    subprocess.run(("arch-chroot", "/tmp/alter-install", "sed", "-i", "\'s/Storage=volatile/#Storage=auto/\' /etc/systemd/journald.conf"))
+        subprocess.run(["arch-chroot", "/tmp/alter-install", "rm", "-rf", files])
+    subprocess.run(["arch-chroot", "/tmp/alter-install", "userdel", "-r", "alter"])
+    subprocess.run(["arch-chroot", "/tmp/alter-install", "sed", "-i", "\'s/Storage=volatile/#Storage=auto/\' /etc/systemd/journald.conf"])
     # clean up
-    subprocess.run(("umount", target_partition))
-    subprocess.run(("rm", "-rf", "/tmp/alter-install"))
+    subprocess.run(["umount", target_partition])
+    subprocess.run(["rm", "-rf", "/tmp/alter-install"])
     print("Alter Linux installation completed!")
 
 # main
