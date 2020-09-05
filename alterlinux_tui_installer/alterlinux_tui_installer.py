@@ -4,7 +4,7 @@ import locale
 import gettext
 import subprocess
 from   subprocess import DEVNULL, STDOUT
-from sys import stdin
+from sys import stdin, stdout
 from   dialog     import Dialog
 hdds_re = re.compile(r"^/dev/[hsnm][dmv].[1234567890eb].*$")
 
@@ -138,7 +138,7 @@ def get_disk_from_partition(part_path):
         return "none"
     else:
         return splitkun[1]
-def install_grub_efi(main_dialog,partition_path):
+def install_grub_efi(main_dialog:Dialog,partition_path):
     disk_path=get_disk_from_partition(partition_path)
     eps_dev_path=""
     while(True):
@@ -151,6 +151,19 @@ def install_grub_efi(main_dialog,partition_path):
         else:
             break
     subprocess.run(["mkdir","-p","/tmp/alter-install/boot/efi"])
+    while(True):
+        tmp2=subprocess.check_output(["lsblk","-pln","-o","FSTYPE",eps_dev_path],stdin=DEVNULL,stderr=DEVNULL)
+        tmp2_str=tmp2.decode()
+        if(tmp2_str == "vfat"):
+            break
+        else:
+            if main_dialog.yesno("Format EFI System Partition?") == main_dialog.OK:
+                subprocess.run(["mkfs.fat","-F32",eps_dev_path])
+                continue
+            else:
+                ask_sure_to_exit(main_dialog)
+                continue
+
     subprocess.run(["mount",eps_dev_path,"/tmp/alter-install/boot/efi"])
     subprocess.run(["arch-chroot","/tmp/alter-install","grub-install","--target=x86_64-efi","--efi-directory=/boot/efi","--bootloader-id=Alter"])
     subprocess.run(["arch-chroot","/tmp/alter-install","grub-mkconfig","-o","/boot/grub/grub.cfg"])
