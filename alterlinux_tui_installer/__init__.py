@@ -1,1 +1,0 @@
-from alterlinux_tui_installer.AlterLinux_TUI_Installer import *
