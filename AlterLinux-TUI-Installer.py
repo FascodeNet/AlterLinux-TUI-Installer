@@ -1,18 +1,22 @@
 #!/usr/bin/env python
 import re
 import locale
+import gettext
 import subprocess
 from   subprocess import DEVNULL
 from   dialog     import Dialog
 hdds_re = re.compile(r"^/dev/[hsnm][dmv].[1234567890eb].*$")
 
+def init_translation():
+    translater=gettext.translation("AlterLinux-TUI-Installer",fallback=True)
+    translater.install()
 
 def finish():
     #subprocess.run("clear")
     exit(0)
 
 def ask_sure_to_exit(main_dialog):
-    if main_dialog.yesno("Are you sure to exit?") == main_dialog.OK:
+    if main_dialog.yesno(_("Are you sure to exit?")) == main_dialog.OK:
         finish()
 
 def was_input_success(main_dialog, input_str):
@@ -194,5 +198,6 @@ def main():
         install(key_layout, target_partition, user_name, host_name, user_pass, root_pass)
     finish()
 
-
-main()
+if __name__ == "__main__":
+    init_translation()
+    main()
