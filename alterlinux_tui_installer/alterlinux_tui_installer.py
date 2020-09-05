@@ -191,7 +191,7 @@ def install(key_layout, target_partition, user_name, host_name, user_pass, root_
     kernel_path="/usr/lib/modules/" + kernel_release_ver + "/vmlinuz"
     subprocess.run(["cp",kernel_path,"/tmp/alter-install/boot/vmlinuz-linux"])
     #mkinitcpio
-    subprocess.run(["mkinitcpio","-P"])
+    subprocess.run(["arch-chroot","/tmp/alter-install","mkinitcpio","-P"])
     #grub install
     install_grub_efi(main_dialog,target_partition)
     # remove settings and files for live boot
