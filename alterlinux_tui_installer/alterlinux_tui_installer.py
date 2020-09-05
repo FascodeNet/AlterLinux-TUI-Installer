@@ -158,7 +158,6 @@ def install_grub_efi(main_dialog,partition_path):
     main_dialog.msgbox("GRUB2 Installed!")
 
 # install
-
 def install(key_layout, target_partition, user_name, host_name, user_pass, root_pass,main_dialog):
     subprocess.run("clear")
     print("Alter Linux installation in progress...")
@@ -195,6 +194,9 @@ def install(key_layout, target_partition, user_name, host_name, user_pass, root_
     subprocess.run(["arch-chroot", "/tmp/alter-install", "groupadd", user_name])
     subprocess.run(["arch-chroot", "/tmp/alter-install", "useradd", "-m", "-g", user_name, "-s", "/bin/zsh", user_name])
     subprocess.run(["arch-chroot", "/tmp/alter-install", "usermod", "-G", "sudo", user_name])
+    # change password
+    subprocess.run(["arch-chroot", "/tmp/alter-install", "passwd", user_name],input=(user_pass+"\n"+user_pass))
+    subprocess.run(["arch-chroot", "/tmp/alter-install", "passwd", user_name],input=(root_pass+"\n"+root_pass))
     # clean up
     subprocess.run(["umount", target_partition])
     subprocess.run(["rm", "-rf", "/tmp/alter-install"])
