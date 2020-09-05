@@ -138,21 +138,19 @@ def get_disk_from_partition(part_path):
         return "none"
     else:
         return splitkun[1]
-def install_kernel_efi(main_dialog:Dialog,partition_path):
+def install_grub_efi(main_dialog:Dialog,partition_path):
     disk_path=get_disk_from_partition(partition_path)
     eps_dev_path=""
-    eps_dev_numb=""
     while(True):
         tmp=subprocess.check_output("sgdisk --print " + disk_path +   " | grep EF00 | awk '{print $1}'",stdin=DEVNULL,stderr=DEVNULL,shell=True)
         eps_dev_path=disk_path + tmp.decode().replace("\n","")
-        eps_dev_numb=tmp.decode().replace("\n","")
         if(tmp.decode() == ""):
             main_dialog.msgbox("Error !\nEFI System Partition not found!\nPlease Create EFI System Partition", width=40)
             subprocess.run(["cfdisk",disk_path])
             continue
         else:
             break
-    subprocess.run(["mkdir","-p","/tmp/alter-install/boot/"])
+    subprocess.run(["mkdir","-p","/tmp/alter-install/boot/efi"])
     while(True):
         tmp2=subprocess.check_output(["lsblk","-pln","-o","FSTYPE",eps_dev_path],stdin=DEVNULL,stderr=DEVNULL)
         tmp2_str=tmp2.decode()
@@ -168,10 +166,8 @@ def install_kernel_efi(main_dialog:Dialog,partition_path):
                 continue
 
     subprocess.run(["mount",eps_dev_path,"/tmp/alter-install/boot/efi"])
-
-    subprocess.run(["efibootmgr","-d",disk_path,"-p",eps_dev_numb,"-l","-c","-L","Alter Linux","-l","/AlterLinux/vmlinuz-linux","-u","root=" + partition_path + " rw initrd=/AlterLinux/initramfs-linux.img"])
-    subprocess.run(["systemctl","start","efistub-update.service"])
-    subprocess.run("genfstab -U /tmp/alter-install >> /tmp/alter-install/etc/fstab",shell=True)
+    subprocess.run(["arch-chroot","/tmp/alter-install","grub-install","--target=x86_64-efi","--efi-directory=/boot/efi","--bootloader-id=Alter"])
+    subprocess.run(["arch-chroot","/tmp/alter-install","grub-mkconfig","-o","/boot/grub/grub.cfg"])
     subprocess.run(["umount","/tmp/alter-install/boot/efi"])
 
 # install
@@ -187,7 +183,7 @@ def install(key_layout, target_partition, user_name, host_name, user_pass, root_
         ["find", "/run/archiso/bootmnt", "-name", "airootfs.sfs"],
         text=True)
     subprocess.run(["unsquashfs", "-f", "-d", "/tmp/alter-install", airootfs_path.rstrip("\n")])
-    install_kernel_efi(main_dialog,target_partition)
+    install_grub_efi(main_dialog,target_partition)
     # remove settings and files for live boot
     need_remove_files = [
         "/usr/share/calamares/",
