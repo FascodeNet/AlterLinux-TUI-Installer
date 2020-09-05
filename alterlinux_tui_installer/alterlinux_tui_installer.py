@@ -168,6 +168,7 @@ def install_grub_efi(main_dialog:Dialog,partition_path):
     subprocess.run(["mount",eps_dev_path,"/tmp/alter-install/boot/efi"])
     subprocess.run(["arch-chroot","/tmp/alter-install","grub-install","--target=x86_64-efi","--efi-directory=/boot/efi","--bootloader-id=Alter"])
     subprocess.run(["arch-chroot","/tmp/alter-install","grub-mkconfig","-o","/boot/grub/grub.cfg"])
+    subprocess.run("genfstab -U /tmp/alter-install >> /tmp/alter-install/etc/fstab",shell=True)
     subprocess.run(["umount","/tmp/alter-install/boot/efi"])
 
 # install
