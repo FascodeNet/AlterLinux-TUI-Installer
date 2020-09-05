@@ -195,12 +195,11 @@ def install(key_layout, target_partition, user_name, host_name, user_pass, root_
     subprocess.run(["arch-chroot", "/tmp/alter-install", "useradd", "-m", "-g", user_name, "-s", "/bin/zsh", user_name])
     subprocess.run(["arch-chroot", "/tmp/alter-install", "usermod", "-G", "sudo", user_name])
     # change password
-    subprocess.run(["arch-chroot", "/tmp/alter-install", "passwd", user_name],input=(user_pass+"\n"+user_pass), text=True)
-    subprocess.run(["arch-chroot", "/tmp/alter-install", "passwd", user_name],input=(root_pass+"\n"+root_pass), text=True)
+    subprocess.run(["arch-chroot", "/tmp/alter-install", "passwd", user_name], input=(user_pass+"\n"+user_pass), text=True)
+    subprocess.run(["arch-chroot", "/tmp/alter-install", "passwd", user_name], input=(root_pass+"\n"+root_pass), text=True)
     # clean up
     subprocess.run(["umount", target_partition])
     subprocess.run(["rm", "-rf", "/tmp/alter-install"])
-    print("Alter Linux installation completed!")
 
 # main
 def main():
@@ -230,7 +229,8 @@ def main():
             else:
                 ask_sure_to_exit(main_dialog)
                 continue
-        install(key_layout, target_partition, user_name, host_name, user_pass, root_pass,main_dialog)
+        install(key_layout, target_partition, user_name, host_name, user_pass, root_pass, main_dialog)
+        main_dialog.msgbox("Alter Linux installation completed!")
     finish()
 if __name__ == "__main__":
     init_translation()
