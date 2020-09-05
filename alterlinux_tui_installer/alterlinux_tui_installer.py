@@ -189,7 +189,7 @@ def install(key_layout, target_partition, user_name, host_name, user_pass, root_
     #kernel copy
     kernel_release_ver=os.uname().release
     kernel_path="/usr/lib/modules/" + kernel_release_ver + "/vmlinuz"
-    shutil.copy2(kernel_path,"/boot/vmlinuz-linux")
+    subprocess.run(["cp","-r",kernel_path,"/boot/vmlinuz-linux"])
     #mkinitcpio
     subprocess.run(["mkinitcpio","-P"])
     #grub install
