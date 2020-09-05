@@ -111,11 +111,11 @@ def get_target_partition():
     return str_partition_list
 
 def hdd_select(main_dialog):
-    can_install_partition_str = get_target_partition()
-    can_install_partitions    = []
-    for insthdd in can_install_partition_str:
-        can_install_partitions.append((insthdd,""))
     while(True):
+        can_install_partition_str = get_target_partition()
+        can_install_partitions    = []
+        for insthdd in can_install_partition_str:
+            can_install_partitions.append((insthdd,""))
         code,tag = main_dialog.menu("Which HDD do you want to install?",
         choices  = can_install_partitions)
         if code == main_dialog.OK:
