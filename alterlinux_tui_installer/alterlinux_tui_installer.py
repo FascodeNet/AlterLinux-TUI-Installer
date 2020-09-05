@@ -143,7 +143,7 @@ def install_grub_efi(main_dialog:Dialog,partition_path):
     eps_dev_path=""
     while(True):
         tmp=subprocess.check_output("sgdisk --print " + disk_path +   " | grep EF00 | awk '{print $1}'",stdin=DEVNULL,stderr=DEVNULL,shell=True)
-        eps_dev_path=disk_path + tmp.decode()
+        eps_dev_path=disk_path + tmp.decode().replace("\n","")
         if(tmp.decode() == ""):
             main_dialog.msgbox("Error !\nEFI System Partition not found!\nPlease Create EFI System Partition", width=40)
             subprocess.run(["cfdisk",disk_path])
@@ -154,7 +154,7 @@ def install_grub_efi(main_dialog:Dialog,partition_path):
     while(True):
         tmp2=subprocess.check_output(["lsblk","-pln","-o","FSTYPE",eps_dev_path],stdin=DEVNULL,stderr=DEVNULL)
         tmp2_str=tmp2.decode()
-        if(tmp2_str == "vfat"):
+        if(tmp2_str == "vfat\n"):
             break
         else:
             if main_dialog.yesno("Format EFI System Partition?") == main_dialog.OK:
