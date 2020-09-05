@@ -197,12 +197,6 @@ def main():
                 continue
         install(key_layout, target_partition, user_name, host_name, user_pass, root_pass)
     finish()
-
-<<<<<<< HEAD
 if __name__ == "__main__":
     init_translation()
     main()
-=======
-
-main()
->>>>>>> 41dac190e6547af13c4a04e091c5476c9f6467ce
