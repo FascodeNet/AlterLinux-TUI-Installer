@@ -246,7 +246,7 @@ def main():
                 ask_sure_to_exit(main_dialog)
                 continue
         install(key_layout, target_partition, user_name, host_name, user_pass, root_pass, main_dialog)
-        main_dialog.msgbox("Alter Linux installation completed!", width=35)
+        main_dialog.msgbox("Alter Linux installation completed!", width=40)
     finish()
 if __name__ == "__main__":
     init_translation()
