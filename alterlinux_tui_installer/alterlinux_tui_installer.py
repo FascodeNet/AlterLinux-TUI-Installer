@@ -3,7 +3,8 @@ import re
 import locale
 import gettext
 import subprocess
-from   subprocess import DEVNULL
+from   subprocess import DEVNULL, STDOUT
+from sys import stdin
 from   dialog     import Dialog
 hdds_re = re.compile(r"^/dev/[hsnm][dmv].[1234567890eb].*$")
 
@@ -95,7 +96,7 @@ def target_diskedit_select(main_dialog):
     code,tag = main_dialog.menu("Which disk do you want to edit?",
     choices=editable_disk_list)
     if code == main_dialog.OK:
-        subprocess.run(["sudo","cfdisk",tag])
+        subprocess.run(["cfdisk",tag])
 
 def get_target_partition():
     tmp                = subprocess.check_output(["lsblk","-pln","-o","NAME"],
@@ -128,10 +129,37 @@ def hdd_select(main_dialog):
         else:
             ask_sure_to_exit(main_dialog)
             continue
+#Grub
+def get_disk_from_partition(part_path):
+    tmp = subprocess.check_output(["lsblk","-dplns","-o","NAME",part_path],stdin=DEVNULL,stderr=DEVNULL)
+    dsk_ls=tmp.decode()
+    splitkun=dsk_ls.split("\n")
+    if splitkun.__len__() < 3:
+        return "none"
+    else:
+        return splitkun[1]
+def install_grub_efi(main_dialog,partition_path):
+    disk_path=get_disk_from_partition(partition_path)
+    eps_dev_path=""
+    while(True):
+        tmp=subprocess.check_output("sgdisk --print " + disk_path +   " | grep EF00 | awk '{print $1}'",stdin=DEVNULL,stderr=DEVNULL,shell=True)
+        eps_dev_path=disk_path + tmp.decode()
+        if(tmp.decode() == ""):
+            main_dialog.msgbox("Error !\nEFI System Partition not found!\nPlease Create EFI System Partition")
+            subprocess.run(["cfdisk",disk_path])
+            continue
+        else:
+            break
+    subprocess.run(["mkdir","-p","/tmp/alter-install/boot/efi"])
+    subprocess.run(["mount",eps_dev_path,"/tmp/alter-install/boot/efi"])
+    subprocess.run(["arch-chroot","/tmp/alter-install","grub-install","--target=x86_64-efi","--efi-directory=/boot/efi","--bootloader-id=Alter"])
+    subprocess.run(["arch-chroot","/tmp/alter-install","grub-mkconfig","-o","/boot/grub/grub.cfg"])
+    subprocess.run(["umount","/tmp/alter-install/boot/efi"])
+    main_dialog.msgbox("GRUB2 Installed!")
 
 # install
 
-def install(key_layout, target_partition, user_name, host_name, user_pass, root_pass):
+def install(key_layout, target_partition, user_name, host_name, user_pass, root_pass,main_dialog):
     subprocess.run("clear")
     print("Alter Linux installation in progress...")
     # format
@@ -143,6 +171,7 @@ def install(key_layout, target_partition, user_name, host_name, user_pass, root_
         ["find", "/run/archiso/bootmnt", "-name", "airootfs.sfs"],
         text=True)
     subprocess.run(["unsquashfs", "-f", "-d", "/tmp/alter-install", airootfs_path.rstrip("\n")])
+    install_grub_efi(main_dialog,target_partition)
     # remove settings and files for live boot
     need_remove_files = [
         "/usr/share/calamares/",
@@ -199,7 +228,7 @@ def main():
             else:
                 ask_sure_to_exit(main_dialog)
                 continue
-        install(key_layout, target_partition, user_name, host_name, user_pass, root_pass)
+        install(key_layout, target_partition, user_name, host_name, user_pass, root_pass,main_dialog)
     finish()
 if __name__ == "__main__":
     init_translation()
