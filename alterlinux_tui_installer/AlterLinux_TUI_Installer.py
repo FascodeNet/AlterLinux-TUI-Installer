@@ -159,9 +159,9 @@ def install(key_layout, target_partition, user_name, host_name, user_pass, root_
         "/etc/systemd/system/getty@tty1.service.d/autologin.conf",
     ]
     for files in need_remove_files:
-        subprocess.run(["chroot", "/tmp/alter-install", "rm", "-rf", files])
-    subprocess.run(["chroot", "/tmp/alter-install", "userdel", "-r", "alter"])
-    subprocess.run(["chroot", "/tmp/alter-install", "sed", "-i", "\'s/Storage=volatile/#Storage=auto/\' /etc/systemd/journald.conf"])
+        subprocess.run(["arch-chroot", "/tmp/alter-install", "rm", "-rf", files])
+    subprocess.run(["arch-chroot", "/tmp/alter-install", "userdel", "-r", "alter"])
+    subprocess.run(["arch-chroot", "/tmp/alter-install", "sed", "-i", "\'s/Storage=volatile/#Storage=auto/\' /etc/systemd/journald.conf"])
     # clean up
     subprocess.run(["umount", target_partition])
     subprocess.run(["rm", "-rf", "/tmp/alter-install"])
