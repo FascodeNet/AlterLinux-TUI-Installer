@@ -145,7 +145,7 @@ def install_grub_efi(main_dialog,partition_path):
         tmp=subprocess.check_output("sgdisk --print " + disk_path +   " | grep EF00 | awk '{print $1}'",stdin=DEVNULL,stderr=DEVNULL,shell=True)
         eps_dev_path=disk_path + tmp.decode()
         if(tmp.decode() == ""):
-            main_dialog.msgbox("Error !\nEFI System Partition not found!\nPlease Create EFI System Partition")
+            main_dialog.msgbox("Error !\nEFI System Partition not found!\nPlease Create EFI System Partition", width=50)
             subprocess.run(["cfdisk",disk_path])
             continue
         else:
@@ -230,7 +230,7 @@ def main():
                 ask_sure_to_exit(main_dialog)
                 continue
         install(key_layout, target_partition, user_name, host_name, user_pass, root_pass, main_dialog)
-        main_dialog.msgbox("Alter Linux installation completed!")
+        main_dialog.msgbox("Alter Linux installation completed!", width=50)
     finish()
 if __name__ == "__main__":
     init_translation()
