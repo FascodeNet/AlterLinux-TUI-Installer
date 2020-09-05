@@ -162,6 +162,10 @@ def install(key_layout, target_partition, user_name, host_name, user_pass, root_
         subprocess.run(["arch-chroot", "/tmp/alter-install", "rm", "-rf", files])
     subprocess.run(["arch-chroot", "/tmp/alter-install", "userdel", "-r", "alter"])
     subprocess.run(["arch-chroot", "/tmp/alter-install", "sed", "-i", "\'s/Storage=volatile/#Storage=auto/\' /etc/systemd/journald.conf"])
+    # add user
+    subprocess.run(["arch-chroot", "/tmp/alter-install", "groupadd", user_name])
+    subprocess.run(["arch-chroot", "/tmp/alter-install", "useradd", "-m", "-g", user_name, "-s", "/bin/zsh", user_name])
+    subprocess.run(["arch-chroot", "/tmp/alter-install", "usermod", "-G", "sudo", user_name])
     # clean up
     subprocess.run(["umount", target_partition])
     subprocess.run(["rm", "-rf", "/tmp/alter-install"])
