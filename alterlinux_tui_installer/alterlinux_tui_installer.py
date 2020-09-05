@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from encodings import utf_8
 import re
 import locale
 import gettext
@@ -189,7 +190,9 @@ def install(key_layout, target_partition, user_name, host_name, user_pass, root_
     #kernel copy
     kernel_release_ver=os.uname().release
     kernel_path="/usr/lib/modules/" + kernel_release_ver + "/vmlinuz"
-    subprocess.run(["cp",kernel_path,"/tmp/alter-install/boot/vmlinuz-linux"])
+    kernelname_file=open("/root/kernel_filename","r")
+    kernel_name=kernelname_file.readline().strip()
+    subprocess.run(["cp",kernel_path,"/tmp/alter-install/boot/" + kernel_name])
     #mkinitcpio
     subprocess.run(["arch-chroot","/tmp/alter-install","mkinitcpio","-P"])
     #grub install
