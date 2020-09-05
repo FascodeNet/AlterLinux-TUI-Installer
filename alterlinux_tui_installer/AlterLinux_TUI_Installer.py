@@ -8,7 +8,7 @@ from   dialog     import Dialog
 hdds_re = re.compile(r"^/dev/[hsnm][dmv].[1234567890eb].*$")
 
 def init_translation():
-    translater=gettext.translation("AlterLinux-TUI-Installer",fallback=True)
+    translater=gettext.translation("alterlinux_tui_installer",fallback=True)
     translater.install()
 
 def finish():
