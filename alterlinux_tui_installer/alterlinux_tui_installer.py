@@ -203,8 +203,9 @@ def install(key_layout, target_partition, user_name, host_name, user_pass, root_
         subprocess.run(["arch-chroot", "/tmp/alter-install", "rm", "-rf", files])
     subprocess.run(["arch-chroot", "/tmp/alter-install", "userdel", "-r", "alter"])
     subprocess.run(["arch-chroot", "/tmp/alter-install", "sed", "-i", "\'s/Storage=volatile/#Storage=auto/\' /etc/systemd/journald.conf"])
-    # change host name
+    # change host name and keyboard
     subprocess.run(["arch-chroot", "/tmp/alter-install", "hostnamectl", "set-hostname", host_name])
+    subprocess.run(["arch-chroot", "/tmp/alter-install", "localectl", "set-keymap", key_layout])
     # add user
     subprocess.run(["arch-chroot", "/tmp/alter-install", "groupadd", user_name])
     subprocess.run(["arch-chroot", "/tmp/alter-install", "useradd", "-m", "-g", user_name, "-s", "/bin/zsh", user_name])
