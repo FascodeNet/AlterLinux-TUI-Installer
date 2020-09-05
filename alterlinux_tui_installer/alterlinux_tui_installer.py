@@ -169,7 +169,6 @@ def install_grub_efi(main_dialog:Dialog,partition_path):
     subprocess.run(["arch-chroot","/tmp/alter-install","grub-install","--target=x86_64-efi","--efi-directory=/boot/efi","--bootloader-id=Alter"])
     subprocess.run(["arch-chroot","/tmp/alter-install","grub-mkconfig","-o","/boot/grub/grub.cfg"])
     subprocess.run(["umount","/tmp/alter-install/boot/efi"])
-    main_dialog.msgbox("GRUB2 Installed!")
 
 # install
 def install(key_layout, target_partition, user_name, host_name, user_pass, root_pass,main_dialog):
