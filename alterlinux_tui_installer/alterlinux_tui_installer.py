@@ -132,6 +132,7 @@ def hdd_select(main_dialog):
         else:
             ask_sure_to_exit(main_dialog)
             continue
+
 #Grub
 def get_disk_from_partition(part_path):
     tmp = subprocess.check_output(["lsblk","-dplns","-o","NAME",part_path],stdin=DEVNULL,stderr=DEVNULL)
@@ -141,7 +142,8 @@ def get_disk_from_partition(part_path):
         return "none"
     else:
         return splitkun[1]
-def install_grub_efi(main_dialog:Dialog,partition_path):
+
+def get_grub_efi_target(main_dialog:Dialog, partition_path):
     disk_path=get_disk_from_partition(partition_path)
     eps_dev_path=""
     while(True):
@@ -167,15 +169,10 @@ def install_grub_efi(main_dialog:Dialog,partition_path):
             else:
                 ask_sure_to_exit(main_dialog)
                 continue
-
-    subprocess.run(["mount",eps_dev_path,"/tmp/alter-install/boot/efi"])
-    subprocess.run(["arch-chroot","/tmp/alter-install","grub-install","--target=x86_64-efi","--efi-directory=/boot/efi","--bootloader-id=Alter"])
-    subprocess.run(["arch-chroot","/tmp/alter-install","grub-mkconfig","-o","/boot/grub/grub.cfg"])
-    subprocess.run("genfstab -U /tmp/alter-install >> /tmp/alter-install/etc/fstab",shell=True)
-    subprocess.run(["umount","/tmp/alter-install/boot/efi"])
+        return eps_dev_path
 
 # install
-def install(key_layout, target_partition, user_name, host_name, user_pass, root_pass,main_dialog):
+def install(key_layout, target_partition, user_name, host_name, user_pass, root_pass, eps_dev_path):
     subprocess.run("clear")
     print("Alter Linux installation in progress...")
     # format
@@ -197,7 +194,11 @@ def install(key_layout, target_partition, user_name, host_name, user_pass, root_
     #mkinitcpio
     subprocess.run(["arch-chroot","/tmp/alter-install","mkinitcpio","-P"])
     #grub install
-    install_grub_efi(main_dialog,target_partition)
+    subprocess.run(["mount",eps_dev_path,"/tmp/alter-install/boot/efi"])
+    subprocess.run(["arch-chroot","/tmp/alter-install","grub-install","--target=x86_64-efi","--efi-directory=/boot/efi","--bootloader-id=Alter"])
+    subprocess.run(["arch-chroot","/tmp/alter-install","grub-mkconfig","-o","/boot/grub/grub.cfg"])
+    subprocess.run("genfstab -U /tmp/alter-install >> /tmp/alter-install/etc/fstab",shell=True)
+    subprocess.run(["umount","/tmp/alter-install/boot/efi"])
     # remove settings and files for live boot
     need_remove_files = [
         "/usr/share/calamares/",
@@ -246,6 +247,8 @@ def main():
         # get install target hdd
         target_partition = hdd_select(main_dialog)
         conf_str        += "Install target partition : {}\n".format(target_partition)
+        # get grub target partition
+        eps_dev_path     = get_grub_efi_target(main_dialog, target_partition)
         # set user data
         user_name        = input_dialog(main_dialog, "What is your user name?",)
         conf_str        += "User name : {}\n".format(user_name)
@@ -262,7 +265,7 @@ def main():
             else:
                 ask_sure_to_exit(main_dialog)
                 continue
-        install(key_layout, target_partition, user_name, host_name, user_pass, root_pass, main_dialog)
+        install(key_layout, target_partition, user_name, host_name, user_pass, root_pass, eps_dev_path)
         main_dialog.msgbox("Alter Linux installation completed!", width=40)
     finish()
 if __name__ == "__main__":
