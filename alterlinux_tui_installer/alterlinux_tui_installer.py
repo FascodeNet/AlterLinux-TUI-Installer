@@ -125,6 +125,11 @@ def hdd_select(main_dialog):
             if tag == "Edit the partitions manually":
                 target_diskedit_select(main_dialog)
                 continue
+            disk_path=get_disk_from_partition(tag)
+            tmp=subprocess.check_output("sgdisk --print " + disk_path +   " | grep EF00 | awk '{print $1}'",stdin=DEVNULL,stderr=DEVNULL,shell=True)
+            if(tmp.decode() == ""):
+                main_dialog.msgbox("Error !\nEFI System Partition not found!\nPlease Create EFI System Partition", width=40)
+                continue
             if main_dialog.yesno("Do you want to install in \"{}\" ?".format(tag)) == main_dialog.OK:
                 return tag
             else:
