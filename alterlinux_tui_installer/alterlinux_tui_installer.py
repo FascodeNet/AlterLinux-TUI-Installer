@@ -160,7 +160,6 @@ def get_grub_efi_target(main_dialog:Dialog, partition_path):
             continue
         else:
             break
-    subprocess.run(["mkdir","-p","/tmp/alter-install/boot/efi"])
     while(True):
         tmp2=subprocess.check_output(["lsblk","-pln","-o","FSTYPE",eps_dev_path],stdin=DEVNULL,stderr=DEVNULL)
         tmp2_str=tmp2.decode()
@@ -199,6 +198,7 @@ def install(key_layout, target_partition, user_name, host_name, user_pass, root_
     #mkinitcpio
     subprocess.run(["arch-chroot","/tmp/alter-install","mkinitcpio","-P"])
     #grub install
+    subprocess.run(["mkdir","-p","/tmp/alter-install/boot/efi"])
     subprocess.run(["mount",eps_dev_path,"/tmp/alter-install/boot/efi"])
     subprocess.run(["arch-chroot","/tmp/alter-install","grub-install","--target=x86_64-efi","--efi-directory=/boot/efi","--bootloader-id=Alter"])
     subprocess.run(["arch-chroot","/tmp/alter-install","grub-mkconfig","-o","/boot/grub/grub.cfg"])
