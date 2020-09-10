@@ -16,7 +16,7 @@ def init_translation():
     translater.install()
 
 def finish():
-    #subprocess.run("clear")
+    subprocess.run("clear")
     exit(0)
 
 def ask_sure_to_exit(main_dialog):
