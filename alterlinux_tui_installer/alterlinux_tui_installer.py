@@ -149,16 +149,14 @@ def get_disk_from_partition(part_path):
         return splitkun[1]
 
 def get_grub_efi_target(main_dialog:Dialog, partition_path):
-    disk_path         = get_disk_from_partition(partition_path)
-    eps_dev_path      = ""
-    isPartitionEdited = False
+    disk_path=get_disk_from_partition(partition_path)
+    eps_dev_path=""
     while(True):
         tmp=subprocess.check_output("sgdisk --print " + disk_path +   " | grep EF00 | awk '{print $1}'",stdin=DEVNULL,stderr=DEVNULL,shell=True)
         eps_dev_path=disk_path + tmp.decode().replace("\n","")
         if(tmp.decode() == ""):
             main_dialog.msgbox("Error !\nEFI System Partition not found!\nPlease Create EFI System Partition", width=40)
-            subprocess.run(["cfdisk", disk_path])
-            isPartitionEdited = True
+            subprocess.run(["cfdisk",disk_path])
             continue
         else:
             break
@@ -175,7 +173,7 @@ def get_grub_efi_target(main_dialog:Dialog, partition_path):
             else:
                 ask_sure_to_exit(main_dialog)
                 continue
-        return [isPartitionEdited, eps_dev_path]
+        return eps_dev_path
 
 # install
 def install(key_layout, target_partition, user_name, host_name, user_pass, root_pass, eps_dev_path):
@@ -251,14 +249,11 @@ def main():
         # get keyboard layout
         key_layout       = key_layout_select(main_dialog)
         conf_str        += "Keyboard layout : {}\n".format(key_layout)
-        while(True):
-            # get install target hdd
-            target_partition = hdd_select(main_dialog)
-            # get grub target partition
-            eps_dev_path     = get_grub_efi_target(main_dialog, target_partition)
-            if eps_dev_path[0] == False:
-                break
+        # get install target hdd
+        target_partition = hdd_select(main_dialog)
         conf_str        += "Install target partition : {}\n".format(target_partition)
+        # get grub target partition
+        eps_dev_path     = get_grub_efi_target(main_dialog, target_partition)
         # set user data
         user_name        = input_dialog(main_dialog, "What is your user name?",)
         conf_str        += "User name : {}\n".format(user_name)
@@ -275,7 +270,7 @@ def main():
             else:
                 ask_sure_to_exit(main_dialog)
                 continue
-        install(key_layout, target_partition, user_name, host_name, user_pass, root_pass, eps_dev_path[1])
+        install(key_layout, target_partition, user_name, host_name, user_pass, root_pass, eps_dev_path)
         main_dialog.msgbox("Alter Linux installation completed!", width=40)
     finish()
 if __name__ == "__main__":
